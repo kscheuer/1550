@@ -27,22 +27,22 @@
 #define THERMAL_TEMP_MAX            50.0f
 
 /* PID Parameters */
-#define THERMAL_PID_KP          0.5f
-#define THERMAL_PID_KI          0.05f
+#define THERMAL_PID_KP          0.3f    
+#define THERMAL_PID_KI          0.1f    /* Doubled for faster scrub */
 #define THERMAL_PID_KD          0.0f
 
 /* PID Output Limits (Normalized -1.0 to 1.0, but clamped for safety) */
-#define THERMAL_PID_OUTPUT_MIN  -0.1f   /* -10% cooling effort */
-#define THERMAL_PID_OUTPUT_MAX  0.1f    /* +10% heating effort */
+#define THERMAL_PID_OUTPUT_MIN  -0.3f   /* -30% cooling effort */
+#define THERMAL_PID_OUTPUT_MAX  0.3f    /* +30% heating effort */
 
 /* PID Integrator Limits */
 /** Anti-windup limit for thermal integrator
  * Set so i_term (Ki * integrator) can reach desired output range.
- * With Ki=0.04, limits of ±1.25 allow i_term up to ±0.05 (5%) */
-#define THERMAL_PID_INTEGRATOR_MIN  (-1.25f)
-#define THERMAL_PID_INTEGRATOR_MAX  1.25f
+ * With Ki=0.1 and Output=0.3, Limit should be 10.0 to prevent early clamping 
+ * I dont think this limit really does anything since 30% output limits anyways mayebe we dont need this*/
 
-/* Stability Check */
+#define THERMAL_PID_INTEGRATOR_MIN  (-10.0f)
+#define THERMAL_PID_INTEGRATOR_MAX  10.0f
 #define THERMAL_ERROR_LIMIT     0.1f    /* +/- 0.1 degrees C considered stable */
 
 /* PID Loop Timing */
@@ -74,7 +74,7 @@
 
 /** DAC value for ADN8834 maximum (2.5V) */
 /* Value not used since TEC_DAC_SAFETY_MAX is used instead and is much more
- * conservative (+10% 1.25V)*/
+ * conservative (+30% 1.25V)*/
 #define TEC_DAC_MAX                                                            \
   ((uint16_t)(INTERNAL_DAC_MAX * ADN8834_VMAX / DAC_VREF)) /* ~3103 */
 
@@ -84,18 +84,19 @@
 
 /** DAC value for ADN8834 minimum (0V) */
 /* Value not used since TEC_DAC_SAFETY_MIN is used instead and is much more
- * conservative (-10% 1.25V)*/
+ * conservative (-30 % 1.25V)*/
 #define TEC_DAC_MIN 0U
 
 /* ---- TEC Safety Limits ----
- * Limit DAC output to ±10% of midpoint to prevent excessive TEC current.
- * 1.25V ± 10% = 1.125V to 1.375V
+ * Limit DAC output to ±30% of midpoint to prevent excessive TEC current.
+ I beleive this is redundant since the PID output is already limited to ±0.3 but this is an extra safety measure in case of PID tuning issues or bugs.
+ * 1.25V ± 30% = 0.875V to 1.625V
  */
-#define TEC_SAFETY_PERCENT 0.10f
+#define TEC_SAFETY_PERCENT 0.30f
 #define TEC_DAC_SAFETY_MIN                                                     \
-  ((uint16_t)(TEC_DAC_MID * (1.0f - TEC_SAFETY_PERCENT))) /* ~1396 (1.125V) */
+  ((uint16_t)(TEC_DAC_MID * (1.0f - TEC_SAFETY_PERCENT))) /* ~1085 (0.875V) */
 #define TEC_DAC_SAFETY_MAX                                                     \
-  ((uint16_t)(TEC_DAC_MID * (1.0f + TEC_SAFETY_PERCENT))) /* ~1706 (1.375V) */
+  ((uint16_t)(TEC_DAC_MID * (1.0f + TEC_SAFETY_PERCENT))) /* ~2017 (1.625V) */
 
 
 /* ADN8834 Chopper Amplifier Circuit Constants */

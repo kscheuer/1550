@@ -109,6 +109,10 @@ static volatile uint8_t i2c_rx_buffer[ADS1115_READ_SIZE] __attribute__((aligned(
 
 /**
  * @brief   Initialize a PID controller with given parameters
+ * This is kind of a stupid function it doesnt initialize integrator limits properly 
+ * so we just overwrite later on in code with 
+ * "g_thermal_ctx.pid.integrator_min = THERMAL_PID_INTEGRATOR_MIN; 
+ * g_thermal_ctx.pid.integrator_max = THERMAL_PID_INTEGRATOR_MAX; "
  */
 static void PID_Init(PIDController_t* pid, 
                      float kp, float ki, float kd,
@@ -217,7 +221,7 @@ static float ConvertVoltageToTemperature(float voltage)
  */
 static inline void WriteDAC1(uint16_t value)
 {
-    /* Clamp to TEC safety limits (±10% of midpoint) */
+    /* Clamp to TEC safety limits (±30% of midpoint) */
     if (value < TEC_DAC_SAFETY_MIN)
     {
         value = TEC_DAC_SAFETY_MIN;
@@ -518,7 +522,7 @@ void Thermal_I2C_DMAComplete_Handler(void)
      * At pid_output = -0.1: voltage = 1.125V → DAC = 1396 (cooling)
      */
 
-    /* does this set TEC voltage to +0.1/-0.1 relative to the current or always mid? this doesnt seem right for PID!?!*/
+    
     float dac_voltage = ADN8834_VMID * (1.0f + pid_output);
     uint16_t dac_value = (uint16_t)(dac_voltage * (float)INTERNAL_DAC_MAX / DAC_VREF);
     

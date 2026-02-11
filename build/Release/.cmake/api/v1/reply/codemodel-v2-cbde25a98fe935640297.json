@@ -68,42 +68,42 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "1550::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-1550-Release-af2c2396f5eab7aaa20f.json",
+					"jsonFile" : "target-1550-Release-e0e9ce250b45680fbade.json",
 					"name" : "1550",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 1,
 					"id" : "STM32_Drivers::@768a070a0fe75716b479",
-					"jsonFile" : "target-STM32_Drivers-Release-3c4550a471de4806a725.json",
+					"jsonFile" : "target-STM32_Drivers-Release-7ab3f6981d18611c2210.json",
 					"name" : "STM32_Drivers",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 1,
 					"id" : "USB_Device_Library::@768a070a0fe75716b479",
-					"jsonFile" : "target-USB_Device_Library-Release-81394817be274ab9a98d.json",
+					"jsonFile" : "target-USB_Device_Library-Release-9c337310a0d39b9d0c12.json",
 					"name" : "USB_Device_Library",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "flash::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-flash-Release-bf4aface78d616a2c684.json",
+					"jsonFile" : "target-flash-Release-4bd96f9e0e7240799898.json",
 					"name" : "flash",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "monitor::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-monitor-Release-e5415c32bec5b1f2ba82.json",
+					"jsonFile" : "target-monitor-Release-eaabfe1c869c42be420a.json",
 					"name" : "monitor",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "run::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-run-Release-8161ab92227c479dfd96.json",
+					"jsonFile" : "target-run-Release-4b689756993113958658.json",
 					"name" : "run",
 					"projectIndex" : 0
 				}

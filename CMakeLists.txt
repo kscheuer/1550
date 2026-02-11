@@ -71,6 +71,12 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     # Add user defined libraries
 )
 
+# Add post-build command to print size
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND arm-none-eabi-size $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
+    COMMENT "Firmware Size:"
+)
+
 # --- USER CODE BEGIN Automation ---
 # This creates a "flash" command for your terminal by adding a flash target that uses the STM32_Programmer_CLI to flash the generated .elf file to your hardware. Make sure to have the STM32_Programmer_CLI installed and in your system's PATH for this to work.
 find_program(STM32_PROG_EXE STM32_Programmer_CLI)

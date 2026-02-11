@@ -76,6 +76,11 @@ static volatile uint8_t echo_buffer[64];
 static volatile uint32_t echo_buffer_head = 0;
 static volatile uint32_t echo_buffer_tail = 0;
 
+/** Temperature Logging State */
+static bool temp_log_active = false;
+static uint32_t temp_log_end_tick = 0;
+static uint32_t temp_log_next_print = 0;
+
 /* ============================================================================
  * HELPER FUNCTIONS
  * ============================================================================ */
@@ -233,6 +238,11 @@ static void App_ProcessUSBCommand(uint8_t* cmd_buffer, uint32_t cmd_length) {
             char msg[64];
             snprintf(msg, sizeof(msg), "Set Laser DAC: %u\r\n", dac_val);
             USB_Comm_SendMessage(msg);
+
+            /* Enable 2-second temperature logging */
+            temp_log_active = true;
+            temp_log_end_tick = HAL_GetTick() + 2000;
+            temp_log_next_print = 0; /* Print immediately */
         } else {
              USB_Comm_SendMessage("Error: Missing DAC value\r\n");
         }
@@ -444,6 +454,25 @@ static void CommandProcessed(void)
 
 void USB_Comm_Process(void)
 {
+    /* Handle Temporary Temperature Logging */
+    if (temp_log_active)
+    {
+        uint32_t now = HAL_GetTick();
+        if (now > temp_log_end_tick)
+        {
+            temp_log_active = false;
+        }
+        else if (now >= temp_log_next_print)
+        {
+            float temp = Thermal_GetTemperature();
+            char msg[64];
+            snprintf(msg, sizeof(msg), "> Temp: %.2f C\r\n", temp);
+            USB_Comm_SendData((uint8_t*)msg, strlen(msg));
+            
+            temp_log_next_print = now + 100; /* Print every 100ms */
+        }
+    }
+
     /* First, send any pending echo characters */
     while (echo_buffer_tail != echo_buffer_head)
     {

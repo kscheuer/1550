@@ -14,7 +14,7 @@
 
 /* Global buffer for DMA transfer (MUST be in RAM) */
 /* Marked volatile just in case, though DMA doesn't care about CPU cache coherency on M4 usually */
-uint8_t g_spi5_tx_buffer[SPI_TX_BUFFER_SIZE];
+static volatile uint8_t g_spi5_tx_buffer[SPI_TX_BUFFER_SIZE];
 
 /* ============================================================================
  * INTERNAL FUNCTIONS
@@ -131,6 +131,9 @@ void Laser_Init(void) {
     /* This allows SPI to issue requests to DMA whenever CS is asserted and clock runs */
     SPI5->CR2 |= SPI_CR2_TXDMAEN;
     SPI5->CR1 |= SPI_CR1_SPE;
+
+    /* 3. Explicitly Zero the DAC on Startup for Safety */
+    Laser_SetCurrent(0.0f);
 }
 
 void Laser_SetCurrent(float current_normalized) {

@@ -189,7 +189,7 @@ build 1550.elf: C_EXECUTABLE_LINKER__1550_Debug cmake/stm32cubemx/CMakeFiles/STM
   LINK_FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -T "C:/Users/Elizabeth D/Documents/GitHub/1550/STM32F429XX_FLASH.ld" --specs=nano.specs -Wl,-Map=1550.map -Wl,--gc-sections -Wl,--print-memory-usage -u _printf_float
   LINK_LIBRARIES = -lm
   OBJECT_DIR = CMakeFiles\1550.dir
-  POST_BUILD = cd .
+  POST_BUILD = C:\WINDOWS\system32\cmd.exe /C "cd /D "C:\Users\Elizabeth D\Documents\GitHub\1550\build\Debug" && arm-none-eabi-size "C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/1550.elf""
   PRE_LINK = cd .
   TARGET_FILE = 1550.elf
   TARGET_PDB = 1550.elf.dbg

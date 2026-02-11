@@ -42,21 +42,22 @@
 2016	2624	7924702136906767	cmake/stm32cubemx/CMakeFiles/USB_Device_Library.dir/__/__/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c.obj	f28a1b6671255c28
 2167	2656	7924702138485396	cmake/stm32cubemx/CMakeFiles/USB_Device_Library.dir/__/__/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c.obj	d84d9f013b7258ba
 2656	2981	7924702143305866	1550.elf	7fa2e4d12b32a7fa
-3	2576	7924702323786391	CMakeFiles/flash	dfc42c7c841be61b
-3	2576	7924702323786391	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/flash	dfc42c7c841be61b
-14	32132	7924699508490490	CMakeFiles/run	d23b22669df5a6a1
-14	32132	7924699508490490	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/run	d23b22669df5a6a1
-16	253	7924703918988353	build.ninja	5d80d62c92bba285
-16	253	7924703918883419	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/cmake_install.cmake	5d80d62c92bba285
-16	253	7924703918948355	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/cmake/stm32cubemx/cmake_install.cmake	5d80d62c92bba285
-19	258	7924703918988353	build.ninja	5d80d62c92bba285
-19	258	7924703918988353	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/cmake_install.cmake	5d80d62c92bba285
-19	258	7924703918988353	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/cmake/stm32cubemx/cmake_install.cmake	5d80d62c92bba285
-4	2607	7924703975464336	CMakeFiles/flash	dfc42c7c841be61b
-4	2607	7924703975464336	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/flash	dfc42c7c841be61b
-2	235060	7924703974961255	CMakeFiles/run	31cf1bb0b4114e54
-2	235060	7924703974961255	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/run	31cf1bb0b4114e54
 4	2612	7924706343358246	CMakeFiles/flash	dfc42c7c841be61b
 4	2612	7924706343358246	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/flash	dfc42c7c841be61b
 21	180488	7924706342909035	CMakeFiles/run	31cf1bb0b4114e54
 21	180488	7924706342909035	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/run	31cf1bb0b4114e54
+19	258	7925466163293597	build.ninja	5d80d62c92bba285
+19	258	7925466163148254	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/cmake_install.cmake	5d80d62c92bba285
+19	258	7925466163233557	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/cmake/stm32cubemx/cmake_install.cmake	5d80d62c92bba285
+15	73371374	7924708196817188	CMakeFiles/monitor	d870b7cae0242098
+15	73371374	7924708196817188	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/monitor	d870b7cae0242098
+2	253	7925466163293597	build.ninja	5d80d62c92bba285
+2	253	7925466163293597	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/cmake_install.cmake	5d80d62c92bba285
+2	253	7925466163293597	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/cmake/stm32cubemx/cmake_install.cmake	5d80d62c92bba285
+24	345	7925466164537656	CMakeFiles/1550.dir/App/Src/laser_current.c.obj	e2e6f0fabab89d72
+15	349	7925466164442717	CMakeFiles/1550.dir/Core/Src/stm32f4xx_it.c.obj	d64be9441ff7aad9
+4	360	7925466164342701	CMakeFiles/1550.dir/USB_DEVICE/App/usbd_cdc_if.c.obj	9e67a85cb8c1d362
+19	367	7925466164482706	CMakeFiles/1550.dir/App/Src/thermal_control.c.obj	fc1ac0d37c067c35
+10	376	7925466164402711	CMakeFiles/1550.dir/Core/Src/main.c.obj	f426b295dee473aa
+29	395	7925466164589578	CMakeFiles/1550.dir/App/Src/usb_comm.c.obj	15ac3c85b7cee9f4
+395	768	7925466168245607	1550.elf	a67be0076d2e5285
