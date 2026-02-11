@@ -1,0 +1,62 @@
+# ninja log v7
+47	307	7924702117221136	CMakeFiles/1550.dir/Core/Src/sysmem.c.obj	c7206e8a092ba487
+52	344	7924702117261131	CMakeFiles/1550.dir/Core/Src/syscalls.c.obj	fa06ec970d237b6a
+9	547	7924702116837210	CMakeFiles/1550.dir/USB_DEVICE/App/usb_device.c.obj	9d30a4034edb581d
+41	570	7924702117158765	CMakeFiles/1550.dir/Core/Src/stm32f4xx_hal_timebase_tim.c.obj	80698f0ba741b4b8
+19	578	7924702116937173	CMakeFiles/1550.dir/USB_DEVICE/App/usbd_cdc_if.c.obj	9e67a85cb8c1d362
+4	614	7924702116787569	CMakeFiles/1550.dir/USB_DEVICE/Target/usbd_conf.c.obj	95f70f463f176e62
+14	490	7924702116892757	CMakeFiles/1550.dir/USB_DEVICE/App/usbd_desc.c.obj	dffcfc90a15933f0
+323	563	7924702120130442	CMakeFiles/1550.dir/startup_stm32f429xx.s.obj	bba7f35f31d0de1b
+30	512	7924702117041289	CMakeFiles/1550.dir/Core/Src/stm32f4xx_it.c.obj	d64be9441ff7aad9
+36	541	7924702117103632	CMakeFiles/1550.dir/Core/Src/stm32f4xx_hal_msp.c.obj	88a28f5e89c2d635
+351	930	7924702120317102	CMakeFiles/1550.dir/App/Src/thermal_control.c.obj	fc1ac0d37c067c35
+542	1050	7924702122161806	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f4xx.c.obj	afefe04951b6be14
+588	1285	7924702122723823	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj	b2824cccb079d8ab
+497	1112	7924702121805290	CMakeFiles/1550.dir/App/Src/laser_current.c.obj	e2e6f0fabab89d72
+529	1146	7924702122039363	CMakeFiles/1550.dir/App/Src/usb_comm.c.obj	15ac3c85b7cee9f4
+573	1186	7924702122475868	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj	e446e90dc82541a0
+564	1270	7924702122385859	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj	c234b6d2ffdebdb1
+608	1365	7924702122823870	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj	65b82c9df6cb7dd2
+553	1453	7924702122317978	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj	c56133d7b7865a4e
+615	1164	7924702122893055	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj	292dd2966faceec3
+936	1544	7924702126177663	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c.obj	85fc5be7c4bcd7bd
+1064	1787	7924702127386048	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c.obj	2c754db2fbb8930b
+1133	1764	7924702128146472	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c.obj	aae981b096b58097
+1171	1866	7924702128554765	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj	43593139bb3c2881
+1152	1793	7924702128324534	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c.obj	e048b2afb8cee823
+1279	1894	7924702129538952	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj	ccda8a778f29e0f5
+1255	1935	7924702129289983	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c.obj	da9337ca4c8054a8
+1312	1815	7924702129902326	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c.obj	110f744d8ed599f3
+1372	1991	7924702130464176	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c.obj	8f8877294ca6793b
+1781	2338	7924702134548920	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c.obj	1cbb6cb6ac5b4b7f
+1580	2163	7924702132544001	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj	2f1d50f47ead132
+1488	2133	7924702131643126	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj	d245f835188cd67b
+1787	2367	7924702134619070	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dac.c.obj	d9e6b8c84bd27603
+1794	2362	7924702134682978	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dac_ex.c.obj	2b1f6dbd14df3cbc
+23	604	7924702116977173	CMakeFiles/1550.dir/Core/Src/main.c.obj	f426b295dee473aa
+1867	2449	7924702135414721	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c.obj	bf6de3ff6ca156e6
+1895	2507	7924702135699576	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj	38a07bbc3fca5823
+2137	2610	7924702138116141	cmake/stm32cubemx/CMakeFiles/USB_Device_Library.dir/__/__/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c.obj	8d68d4203b0f71a8
+1815	2639	7924702134896583	cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj	931f5ca7a43391b0
+1935	2517	7924702136101506	cmake/stm32cubemx/CMakeFiles/USB_Device_Library.dir/__/__/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c.obj	5624f6ca54bf5a53
+2016	2624	7924702136906767	cmake/stm32cubemx/CMakeFiles/USB_Device_Library.dir/__/__/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c.obj	f28a1b6671255c28
+2167	2656	7924702138485396	cmake/stm32cubemx/CMakeFiles/USB_Device_Library.dir/__/__/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c.obj	d84d9f013b7258ba
+2656	2981	7924702143305866	1550.elf	7fa2e4d12b32a7fa
+3	2576	7924702323786391	CMakeFiles/flash	dfc42c7c841be61b
+3	2576	7924702323786391	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/flash	dfc42c7c841be61b
+14	32132	7924699508490490	CMakeFiles/run	d23b22669df5a6a1
+14	32132	7924699508490490	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/run	d23b22669df5a6a1
+16	253	7924703918988353	build.ninja	5d80d62c92bba285
+16	253	7924703918883419	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/cmake_install.cmake	5d80d62c92bba285
+16	253	7924703918948355	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/cmake/stm32cubemx/cmake_install.cmake	5d80d62c92bba285
+19	258	7924703918988353	build.ninja	5d80d62c92bba285
+19	258	7924703918988353	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/cmake_install.cmake	5d80d62c92bba285
+19	258	7924703918988353	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/cmake/stm32cubemx/cmake_install.cmake	5d80d62c92bba285
+4	2607	7924703975464336	CMakeFiles/flash	dfc42c7c841be61b
+4	2607	7924703975464336	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/flash	dfc42c7c841be61b
+2	235060	7924703974961255	CMakeFiles/run	31cf1bb0b4114e54
+2	235060	7924703974961255	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/run	31cf1bb0b4114e54
+4	2612	7924706343358246	CMakeFiles/flash	dfc42c7c841be61b
+4	2612	7924706343358246	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/flash	dfc42c7c841be61b
+21	180488	7924706342909035	CMakeFiles/run	31cf1bb0b4114e54
+21	180488	7924706342909035	C:/Users/Elizabeth D/Documents/GitHub/1550/build/Debug/CMakeFiles/run	31cf1bb0b4114e54

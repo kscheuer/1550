@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/Elizabeth D/Documents/GitHub/1550/build/Release/cmake_install.cmake",
+		"C:/Users/Elizabeth D/Documents/GitHub/1550/build/Release/cmake/stm32cubemx/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
