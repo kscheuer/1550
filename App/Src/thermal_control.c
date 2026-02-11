@@ -48,8 +48,7 @@ extern TIM_HandleTypeDef htim6;
  * ADS1115 CONFIGURATION
  * ============================================================================ */
 
-/** ADS1115 I2C address (ADDR pin to GND) */
-#define ADS1115_ADDRESS         0x48
+/* ADS1115 address and config defined in app_config.h */
 
 /** ADS1115 register addresses */
 #define ADS1115_REG_CONVERSION  0x00
@@ -57,24 +56,6 @@ extern TIM_HandleTypeDef htim6;
 
 /** Number of bytes to read from ADS1115 (16-bit result) */
 #define ADS1115_READ_SIZE       2
-
-/** 
- * ADS1115 Config Register Value
- * 
- * Bit fields:
- *   [15]    OS=1      Start single conversion (ignored in continuous mode)
- *   [14:12] MUX=100   AIN0 to GND (single-ended)
- *   [11:9]  PGA=010   ±2.048V FSR
- *   [8]     MODE=0    Continuous conversion mode
- *   [7:5]   DR=100    128 SPS
- *   [4]     COMP_MODE=0
- *   [3]     COMP_POL=0
- *   [2]     COMP_LAT=0
- *   [1:0]   COMP_QUE=11 Disable comparator
- * 
- * Value: 0b1_100_010_0_100_0_0_0_11 = 0xC483
- */
-#define ADS1115_CONFIG_VALUE    0xC483
 
 /* ============================================================================
  * ADS1115 VOLTAGE CONVERSION
@@ -85,8 +66,7 @@ extern TIM_HandleTypeDef htim6;
  *   - 16-bit signed result
  *   - LSB = 2.048V / 32768 = 62.5µV
  */
-#define ADS1115_FSR_VOLTAGE     2.048f
-#define ADS1115_LSB_VOLTAGE     (ADS1115_FSR_VOLTAGE / 32768.0f)
+/* FSR and LSB defined in app_config.h to match CONFIG_VALUE */
 
 /* ============================================================================
  * ADN8834 TEMPERATURE CONVERSION
@@ -103,11 +83,12 @@ extern TIM_HandleTypeDef htim6;
  * At 25°C: VOUT1 = 1.25V (VREF/2)
  * Temperature coefficient: ~25 mV/°C (positive slope: higher V = higher T)
  */
-#define ADN8834_VREF_HALF       1.25f      /* VREF/2 = 2.5V / 2 */
-#define ADN8834_TEMP_COEFF      0.025f     /* 25 mV/°C from datasheet */
-#define ADN8834_NOMINAL_TEMP    25.0f      /* Center point at 25°C */
-#define ADN8834_VOLTAGE_MIN     0.2f       /* Min expected voltage */
-#define ADN8834_VOLTAGE_MAX     2.3f       /* Max expected voltage */
+/*  #define ADN8834_VREF_HALF       1.25f       VREF/2 = 2.5V / 2 
+    #define ADN8834_TEMP_COEFF      0.025f      25 mV/°C from datasheet 
+    #define ADN8834_NOMINAL_TEMP    25.0f       Center point at 25°C 
+    #define ADN8834_VOLTAGE_MIN     0.2f        Min expected voltage 
+    #define ADN8834_VOLTAGE_MAX     2.3f        Max expected voltage 
+    */
 
 /* ============================================================================
  * GLOBAL CONTEXT AND BUFFERS

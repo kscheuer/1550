@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "thermal_control.h"
 #include "usb_comm.h"
+#include "laser_current.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -120,6 +121,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   Thermal_Init();
   Thermal_Start();
+  Laser_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */

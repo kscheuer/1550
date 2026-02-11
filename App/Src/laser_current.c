@@ -7,23 +7,25 @@
 
 #include "laser_current.h"
 #include "main.h"
+#include "app_config.h"
 
-// TODO: Implement laser current control logic
+/* Private Definitions */
+#define SPI_TX_BUFFER_SIZE 3
 
-void LaserCurrent_NotifyThermalError(uint8_t error_code) {
-    // Placeholder implementation
-    // Turn off laser, set error flag, etc.
-}
+/* Global buffer for DMA transfer (MUST be in RAM) */
+/* Marked volatile just in case, though DMA doesn't care about CPU cache coherency on M4 usually */
+uint8_t g_spi5_tx_buffer[SPI_TX_BUFFER_SIZE];
 
+/* ============================================================================
+ * INTERNAL FUNCTIONS
+ * ============================================================================ */
 
-// Approach 1 
 /**
  * @brief   Write DAC value using SPI5 DMA (Fire-and-Forget) with CS handling
  *
  * APPROACH:
  *   DMA2 Stream 6 is configured for single-shot (non-circular)
- * memory-to-peripheral transfers. Unlike SPI1 which runs continuously in
- * circular mode, SPI5 transfers are explicitly triggered each time we want to
+ * memory-to-peripheral transfers. SPI5 transfers are explicitly triggered each time we want to
  * update the DAC. After transferring NDTR bytes, the stream auto-disables (NDTR
  * reaches 0, EN bit clears).
  *
@@ -36,22 +38,21 @@ void LaserCurrent_NotifyThermalError(uint8_t error_code) {
  *   6. Assert CS low (start SPI frame)
  *   7. Enable stream (DMA_SxCR_EN) → DMA immediately begins transfer
  *   8. DMA moves 3 bytes: g_spi5_tx_buffer → SPI5->DR
- *   9. Transfer Complete interrupt fires → Optical_DAC_DMA_Handler() deasserts
+ *   9. Transfer Complete interrupt fires → Laser_DAC_DMA_Handler() deasserts
  * CS
  *
  * WHY SINGLE-SHOT (not circular):
  *   - DAC8411 requires CS toggle per transaction to latch data
  *   - Each DAC write is a discrete 24-bit frame, not continuous streaming
- *   - Circular mode would continuously pump stale data to DAC
  *
  * NOTE: This function asserts CS (Low). The DMA2_Stream6_IRQHandler (via
- * Optical_DAC_DMA_Handler) will deassert CS (High) when transfer completes.
+ * Laser_DAC_DMA_Handler) will deassert CS (High) when transfer completes.
  */
 static inline void WriteDACFireAndForget(float value) {
   uint16_t uvalue;
 
   /* 1. Safety Clamp */
-  const float SAFE_MAX_VAL = (float)DAC_HARDWARE_LIMIT / 65535.0f;
+  const float SAFE_MAX_VAL = (float)LASER_DAC_HARDWARE_LIMIT / 65535.0f;
   if (value < 0.0f) {
     value = 0.0f;
   } else if (value > SAFE_MAX_VAL) {
@@ -77,102 +78,83 @@ static inline void WriteDACFireAndForget(float value) {
   SPI5_EN_GPIO_Port->BSRR = SPI5_EN_Pin;
 
   /* Disable DMA stream before reconfiguring (required by hardware) */
-  DMA2_Stream6->CR &= ~DMA_SxCR_EN;
-
-  /* HARDWARE REQUIREMENT: Wait for EN bit to clear before changing config */
-  while (DMA2_Stream6->CR & DMA_SxCR_EN) {
-    __NOP();
+  if (DMA2_Stream6->CR & DMA_SxCR_EN)
+  {
+      DMA2_Stream6->CR &= ~DMA_SxCR_EN;
+      
+      /* HARDWARE REQUIREMENT: Wait for EN bit to clear before changing config */
+      while (DMA2_Stream6->CR & DMA_SxCR_EN) {
+        __NOP();
+      }
   }
 
   /* Clear any pending interrupt flags */
   DMA2->HIFCR = (DMA_HIFCR_CTCIF6 | DMA_HIFCR_CHTIF6 | DMA_HIFCR_CTEIF6 |
                  DMA_HIFCR_CDMEIF6 | DMA_HIFCR_CFEIF6);
 
-  /* CRITICAL: Explicitly set addresses to ensure correctness */
-  DMA2_Stream6->PAR = (uint32_t)&(SPI5->DR);
-  DMA2_Stream6->M0AR = (uint32_t)g_spi5_tx_buffer;
+  /* Set Addresses - MOVED TO Laser_Init() */
+  /* DMA2_Stream6->PAR = (uint32_t)&(SPI5->DR); */
+  /* DMA2_Stream6->M0AR = (uint32_t)g_spi5_tx_buffer; */
 
   /* Configure transfer length (Must be done every time) */
-  DMA2_Stream6->NDTR = SPI5_TX_BUFFER_SIZE;
+  DMA2_Stream6->NDTR = SPI_TX_BUFFER_SIZE;
 
-  /* Enable SPI DMA Request (TXDMAEN) and Enable SPI (SPE) */
-  /* If HAL init already set SPE, this is redundant but safe */
-  SPI5->CR2 |= SPI_CR2_TXDMAEN;
-  SPI5->CR1 |= SPI_CR1_SPE;
+  /* Enable SPI/DMA Request - MOVED TO Laser_Init() */
+  /* SPI5->CR2 |= SPI_CR2_TXDMAEN; */
+  /* SPI5->CR1 |= SPI_CR1_SPE; */
 
   /* Assert CS (Low) - Start Frame */
+  /* BSRR upper half resets bit (Low) */
   SPI5_EN_GPIO_Port->BSRR = (uint32_t)SPI5_EN_Pin << 16U;
 
   /* Enable stream with TC Interrupt (to deassert CS later) */
-  /* OPTIMIZATION: PAR, M0AR, TXDMAEN, SPE are set once in Optical_Start() */
+  /* OPTIMIZATION: PAR, M0AR, TXDMAEN, SPE set in Laser_Init() */
   DMA2_Stream6->CR |= (DMA_SxCR_EN | DMA_SxCR_TCIE);
 }
 
+/* ============================================================================
+ * EXPORTED FUNCTIONS
+ * ============================================================================ */
 
+/**
+ * @brief   One-time initialization for Laser DAC DMA and SPI
+ *          Call this in main() after MX_DMA_Init and MX_SPI5_Init.
+ */
+void Laser_Init(void) {
+    /* 1. Set Fixed DMA Addresses */
+    /* These registers can only be written when EN=0. 
+       MX_DMA_Init leaves the stream disabled, so this is safe here. */
+    DMA2_Stream6->PAR = (uint32_t)&(SPI5->DR);
+    DMA2_Stream6->M0AR = (uint32_t)g_spi5_tx_buffer;
 
-// Alternative approach 
-
-#include "stdbool.h"
-
-#include "config.h"
-#include "error.h"
-#include "main.h"
-#include "spi_DAC8411.h"
-#include <stdint.h>
-
-static SpiDac_t spidac;
-
-void spidac_init(SPI_HandleTypeDef *hspi) {
-  spidac = (SpiDac_t){
-      .hspi = hspi,
-      .transfer_in_progress = 0,
-      .last_value = 0.0,
-  };
+    /* 2. Enable SPI DMA Request and Enable SPI Peripheral */
+    /* This allows SPI to issue requests to DMA whenever CS is asserted and clock runs */
+    SPI5->CR2 |= SPI_CR2_TXDMAEN;
+    SPI5->CR1 |= SPI_CR1_SPE;
 }
 
-SpiDac_t *spidac_get_state(void) { return &spidac; }
-
-float spidac_get(void) { return spidac.last_value; }
-
-uint32_t spidac_get_overruns(void) { return spidac.overruns; }
-
-error_t spidac_set(float value) {
-  if (value < 0.0f) {
-    value = 0.0f;
-  } else if (value > DAC_MAX_OUTPUT_VALUE) {
-    // warning_printf("DAC8411_SetPower too high! %f\r\n", value);
-    value = 0.0f;
-  }
-
-  uint16_t uvalue = (value * 65535.0f);
-
-  if (spidac.transfer_in_progress) {
-    spidac.overruns += 1;
-    return ERROR_FAIL;
-  }
-
-  spidac.transfer_in_progress = true;
-  spidac.last_value = value;
-
-  // Create the 24-bit frame
-  uint8_t spi_data[3];
-  spi_data[0] = (uvalue >> 10) & 0x3F; // First 6 bits (00 + 4 MSB of data)
-  spi_data[1] = (uvalue >> 2) & 0xFF;  // Next 8 bits (middle 8 bits of data)
-  spi_data[2] = (uvalue << 6) & 0xC0;  // Last 2 bits of data + 6 bits (000000)
-
-  HAL_GPIO_WritePin(SPI5_EN_GPIO_Port, SPI5_EN_Pin, GPIO_PIN_RESET);
-
-  // Transmit the data via SPI using DMA
-  HAL_SPI_Transmit_DMA(spidac.hspi, spi_data, 3);
-  return ERROR_OK;
+void Laser_SetCurrent(float current_normalized) {
+    /* Simply call the fast implementation */
+    WriteDACFireAndForget(current_normalized);
 }
 
-void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {
-  if (hspi == spidac.hspi) {
-    // Set SPI5_EN high after data transmission is complete
-    HAL_GPIO_WritePin(SPI5_EN_GPIO_Port, SPI5_EN_Pin, GPIO_PIN_SET);
+void LaserCurrent_NotifyThermalError(uint8_t error_code) {
+    // Placeholder implementation
+    // Turn off laser, set error flag, etc.
+    WriteDACFireAndForget(0.0f); /* Safe state */
+}
 
-    // Clear the transfer in progress flag
-    spidac.transfer_in_progress = false;
+/**
+ * @brief   Called from DMA2_Stream6_IRQHandler to complete the transaction
+ */
+void Laser_DAC_DMA_Handler(void) {
+  /* Check for Transfer Complete Flag */
+  if (DMA2->HISR & DMA_HISR_TCIF6) {
+    /* Clear flag */
+    DMA2->HIFCR = DMA_HIFCR_CTCIF6;
+
+    /* Deassert CS (High) - Latch Data in DAC8411 */
+    SPI5_EN_GPIO_Port->BSRR = SPI5_EN_Pin;
   }
 }
+

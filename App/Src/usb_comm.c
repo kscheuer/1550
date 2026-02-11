@@ -14,6 +14,7 @@
 
 #include "usb_comm.h"
 #include "thermal_control.h" /* Use existing functional header instead of app.h */
+#include "laser_current.h"
 #include "main.h" /* For HAL handles */
 #include <string.h>
 #include <stdbool.h>
@@ -224,8 +225,11 @@ static void App_ProcessUSBCommand(uint8_t* cmd_buffer, uint32_t cmd_length) {
         char* arg = strtok(NULL, " \r\n");
         if (arg) {
             uint16_t dac_val = (uint16_t)atoi(arg);
-            /* TODO: Implement Laser_SetCurrent(dac_val) in laser_current.c */
-            /* For now, just print what we would do */
+            
+            /* Convert integer DAC value (0-65535) to normalized float (0.0-1.0) */
+            float normalized_val = (float)dac_val / 65535.0f;
+            Laser_SetCurrent(normalized_val);
+            
             char msg[64];
             snprintf(msg, sizeof(msg), "Set Laser DAC: %u\r\n", dac_val);
             USB_Comm_SendMessage(msg);

@@ -3,11 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
-/* Configuration */
-#define USB_COMM_RX_BUFFER_SIZE  128
-#define USB_COMM_CMD_QUEUE_SIZE  5
-#define USB_COMM_TX_BUFFER_SIZE  512
+#include "app_config.h"
 
 /* Types */
 typedef struct
