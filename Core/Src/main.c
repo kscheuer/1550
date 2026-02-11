@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_device.h"
-#include "thermal_control.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -402,10 +401,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(TEC_ENABLE_GPIO_Port, TEC_ENABLE_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(TEC_ENABLE_GPIO_Port, TEC_ENABLE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(SPI5_EN_GPIO_Port, SPI5_EN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(SPI5_EN_GPIO_Port, SPI5_EN_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, FLEX2_Pin|Program_Indicator_Pin|Error_Indicator_Pin, GPIO_PIN_RESET);
@@ -420,8 +419,8 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : SPI5_EN_Pin */
   GPIO_InitStruct.Pin = SPI5_EN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(SPI5_EN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PHOTODIODE_Pin */
@@ -433,7 +432,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : MASTER_START_Pin */
   GPIO_InitStruct.Pin = MASTER_START_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(MASTER_START_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : FLEX2_Pin Program_Indicator_Pin Error_Indicator_Pin */
