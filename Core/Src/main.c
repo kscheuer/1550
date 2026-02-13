@@ -127,7 +127,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-      USB_Comm_Process();
+    USB_Comm_Process();
+    Laser_RunMaintenance(); // if EXTI2 fires before thermal is stable, we have to do this flag check in the main loop to see when we can actually turn on the laser.
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

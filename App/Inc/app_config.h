@@ -48,7 +48,8 @@
 
 /* PID Loop Timing */
 #define THERMAL_LOOP_DT             0.025f  /* 40Hz = 25ms */
-#define THERMAL_LOSS_LOCK_COUNT     40      /* 1 second at 40Hz */
+#define THERMAL_LOSS_LOCK_COUNT     400     /* 10 seconds at 40Hz */
+#define THERMAL_ENTRY_LOCK_COUNT    10      /* 0.25 second at 40Hz (Must stay stable this long to enter LOCKED state) */
 
 /* TEC Drive Limits (Internal DAC 12-bit) 
 

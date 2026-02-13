@@ -22,6 +22,9 @@ static volatile float g_run_current = 0.2424f; // 0.2424 corresponds to 80mA/330
 //80ma was determined ideal from laser characterization. this is laser specific and will need to be stored in flash eventually and accessed via spi
 static volatile bool g_laser_enabled = false;
 
+/* Flag to handle "Power applied while Trigger held HIGH" startup case */
+static volatile bool g_startup_pending_thermal_lock = false;
+
 /* ============================================================================
  * INTERNAL FUNCTIONS
  * ============================================================================ */
@@ -154,9 +157,10 @@ void Laser_Init(void) {
     HAL_NVIC_EnableIRQ(EXTI2_IRQn);
     
     /* 5. Check Initial State */
-    /* THIS IS LIKELY NOT AN ISSUE as main boards has delays and doesn set pin high tilll 1550 is ready anyways */
+    /* THIS IS LIKELY NOT AN ISSUE as main boards has delays and doesnt set pin high till 1550 is ready anyways */
     /* If the pin is HIGH right now (e.g. user holding button during boot),
-       turn the laser on immediately. */
+       attempt to turn the laser on. If Thermal is not stable yet, Laser_TurnOn will
+       handle setting the g_startup_pending_thermal_lock flag for us. */
     if (HAL_GPIO_ReadPin(MASTER_START_GPIO_Port, MASTER_START_Pin) == GPIO_PIN_SET) {
         Laser_TurnOn();
     }
@@ -192,14 +196,29 @@ void Laser_SetRunCurrent(float current_normalized) {
  *          Called by EXTI rising edge or USB command.
  */
 void Laser_TurnOn(void) {
+    /* CRITICAL SECTION: Do not want another interrupt to execute during this (could cause wacky dma transfer, could cause laser on even after error state fires, etc.)  */
+    uint32_t primask_bit = __get_PRIMASK();
+    __disable_irq();
+
     // safety check
     // will not turn laser on if thermal control is not stable OR if the tec is off (likely error but maybe manually disabled).
      if (!Thermal_IsStable()) {
-    return;
+        /* Improved Logic: If Trigger is asserted but Thermal is unstable, mark as pending */
+        /* This handles both Startup Race Conditions and "Early" Triggers where edge happens before stable */
+        if (HAL_GPIO_ReadPin(MASTER_START_GPIO_Port, MASTER_START_Pin) == GPIO_PIN_SET) {
+            g_startup_pending_thermal_lock = true;
+        }
+        __set_PRIMASK(primask_bit); /* Restore interrupts before returning */
+        return;
     }
 
     g_laser_enabled = true;
+    /* Ensure flag is cleared if we successfully turn on */
+    g_startup_pending_thermal_lock = false; 
+
     Laser_SetCurrent(g_run_current);
+    
+    __set_PRIMASK(primask_bit); /* Restore interrupts */
 }
 
 /**
@@ -207,8 +226,41 @@ void Laser_TurnOn(void) {
  *          Called by EXTI falling edge, thermal error, or USB command.
  */
 void Laser_TurnOff(void) {
+    /* CRITICAL SECTION: Atomic State Update */
+    uint32_t primask_bit = __get_PRIMASK();
+    __disable_irq();
+
     g_laser_enabled = false;
+    g_startup_pending_thermal_lock = false; /* Cancel startup retry if user cycled the pin */
+
     Laser_SetCurrent(0.0f);
+    
+    __set_PRIMASK(primask_bit);
+}
+
+/**
+ * @brief   Check synchronization and handle delays. 
+ *          Call this field in the main while(1) loop.
+ */
+void Laser_RunMaintenance(void) {
+    /* TASK 1: Handle Startup Race Condition (Trigger HIGH while Thermal Unstable) */
+    if (g_startup_pending_thermal_lock) {
+        /* Check if Trigger is still HIGH (Master still wants Laser ON) */
+        if (HAL_GPIO_ReadPin(MASTER_START_GPIO_Port, MASTER_START_Pin) == GPIO_PIN_RESET) {
+            /* Trigger went LOW. Master gave up or cycled. Cancel retry. */
+            g_startup_pending_thermal_lock = false;
+        } 
+        /* Check if Thermal is successfully stable now */
+        else if (Thermal_IsStable()) {
+            /* Attempt to turn on again */
+            Laser_TurnOn();
+            
+            if (g_laser_enabled) {
+                /* Success! We are running. Clear the startup flag so we don't auto-retry on future errors. */
+                g_startup_pending_thermal_lock = false;
+            }
+        }
+    }
 }
 
 void Laser_SetCurrent(float current_normalized) {

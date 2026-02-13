@@ -21,6 +21,7 @@ void Laser_TurnOn(void);
 void Laser_TurnOff(void);
 void Laser_SetRunCurrent(float current_normalized);
 void Laser_DAC_DMA_Handler(void);
+void Laser_RunMaintenance(void);
 
 #ifdef __cplusplus
 }

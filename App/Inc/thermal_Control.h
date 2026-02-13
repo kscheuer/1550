@@ -51,7 +51,9 @@ typedef struct {
  */
 typedef enum {
     THERMAL_STATE_OFF = 0,
-    THERMAL_STATE_RUNNING
+    THERMAL_STATE_STABILIZING,   /* PID Running, but temp not yet stable for dwell time */
+    THERMAL_STATE_LOCKED,        /* PID Running, temp stable within limits */
+    THERMAL_STATE_ERROR
 } ThermalState_t;
 
 typedef struct {

@@ -102,6 +102,7 @@ static volatile uint8_t i2c_rx_buffer[ADS1115_READ_SIZE] __attribute__((aligned(
 
 /* Static counter for stability monitoring */
 static uint32_t s_unstable_counter = 0;
+static uint32_t s_stable_dwell_counter = 0;
 
 /* ============================================================================
  * PID CONTROLLER Functions
@@ -341,13 +342,14 @@ void Thermal_Start(void)
     /* Clear any previous errors */
     g_thermal_ctx.error_code = THERMAL_ERROR_NONE;
     s_unstable_counter = 0;
+    s_stable_dwell_counter = 0;
     
     /* Enable TEC driver hardware */
     HAL_GPIO_WritePin(TEC_ENABLE_GPIO_Port, TEC_ENABLE_Pin, GPIO_PIN_SET);
 
-    g_thermal_ctx.state = THERMAL_STATE_RUNNING;
+    g_thermal_ctx.state = THERMAL_STATE_STABILIZING;
     
-    /* TIM6 interrupts were already enabled, but didnt matter till now because 
+    /* TIM6 interrupts were already enabled, but didnt matter till now because  
     TIM6 was not started. Start TIM6 now */
     HAL_TIM_Base_Start_IT(&htim6);
 }
@@ -429,16 +431,9 @@ uint16_t Thermal_GetTECOutput(void)
 
 bool Thermal_IsStable(void)
 {
-    /* Not stable if control is stopped or in error */
-  if (g_thermal_ctx.state != THERMAL_STATE_RUNNING) {
-    return false;
-  }
-
-    /* Calculate error fresh from current temp and target */
-    float abs_error = g_thermal_ctx.target_temp - g_thermal_ctx.temperature;
-    if (abs_error < 0.0f) abs_error = -abs_error;
-    // temp not stable error code?? 
-    return (abs_error < (float)THERMAL_ERROR_LIMIT);
+    /* Stable only if we have entered the LOCKED state */
+    /* This implies we have been within error limits for > 1 second */
+    return (g_thermal_ctx.state == THERMAL_STATE_LOCKED);
 }
 
 /* ============================================================================
@@ -484,6 +479,7 @@ void Thermal_I2C_DMAComplete_Handler(void)
     /* Check for conversion error */
     if (temperature == THERMAL_ERROR_TEMPERATURE)
     {
+        g_thermal_ctx.state = THERMAL_STATE_ERROR;
         /* Sensor out of range - disable TEC/thermistor hardware and notify laser current control */
         Thermal_Stop(); /* Stop loop to prevent error flooding and ensure hardware off */
         
@@ -499,6 +495,7 @@ void Thermal_I2C_DMAComplete_Handler(void)
     {
         /* Temperature out of safe operating range */
         g_thermal_ctx.error_code = THERMAL_ERROR_TEMP_LIMIT;
+        g_thermal_ctx.state = THERMAL_STATE_ERROR;
         
         /* Disable TEC hardware and set DAC to idle */
         Thermal_Stop(); /* Stop loop */
@@ -515,29 +512,50 @@ void Thermal_I2C_DMAComplete_Handler(void)
     g_thermal_ctx.error = g_thermal_ctx.target_temp - temperature;
 
     /* ========================================
-     * Step 4b: Runtime Stability Monitor
-     * If we are running and error remains (CONSECUTIVLY) high for too long, turn off the laser (but not the TEC).
+     * Step 4b: Runtime Stability State Machine
      * ======================================== */
-    if (g_thermal_ctx.state == THERMAL_STATE_RUNNING) {
+    if (g_thermal_ctx.state != THERMAL_STATE_OFF && g_thermal_ctx.state != THERMAL_STATE_ERROR) {
         float abs_error = g_thermal_ctx.error;
         if (abs_error < 0) abs_error = -abs_error;
 
-        if (abs_error > THERMAL_ERROR_LIMIT) {
-            s_unstable_counter++;
-            
-            if (s_unstable_counter > THERMAL_LOSS_LOCK_COUNT) {
-                /* System has lost lock for >1 second.
-                 * NOTIFY LASER to turn off immediately.
-                 * But keep TEC running to try and re-acquire.
-                 */
-                LaserCurrent_NotifyThermalError(THERMAL_ERROR_UNSTABLE); // No hard error, just turn off
-                
-                // Cap counter to prevent overflow if it stays unstable for weeks
-                s_unstable_counter = THERMAL_LOSS_LOCK_COUNT + 1; 
+        bool currently_within_limits = (abs_error <= THERMAL_ERROR_LIMIT);
+
+        /* STATE: STABILIZING */
+        if (g_thermal_ctx.state == THERMAL_STATE_STABILIZING) {
+            if (currently_within_limits) {
+                s_stable_dwell_counter++;
+                /* If we have been stable for N cycles, promote to LOCKED */
+                if (s_stable_dwell_counter >= THERMAL_ENTRY_LOCK_COUNT) {
+                    g_thermal_ctx.state = THERMAL_STATE_LOCKED;
+                    s_unstable_counter = 0; /* Reset loss-of-lock counter */
+                }
+            } else {
+                /* Reset dwell counter if we dip out of limits */
+                s_stable_dwell_counter = 0;
             }
-        } else {
-            /* Error is within limits, reset counter */
-            s_unstable_counter = 0;
+        }
+        
+        /* STATE: LOCKED */
+        else if (g_thermal_ctx.state == THERMAL_STATE_LOCKED) {
+            if (!currently_within_limits) {
+                s_unstable_counter++;
+                
+                /* If we are unstable for too long, treat as error/loss of lock */
+                if (s_unstable_counter > THERMAL_LOSS_LOCK_COUNT) {
+                    /* System has lost lock for >10 seconds. Turn off laser, but NOT TEC/Thermistor (no thermal_Stop() call). */
+                    LaserCurrent_NotifyThermalError(THERMAL_ERROR_UNSTABLE); // 
+                    
+                    /* Demote back to Stabilizing? Or Error? 
+                       Current logic: Just turn off laser but keep trying to cool. 
+                       So we go back to Stabilizing. */
+                    g_thermal_ctx.state = THERMAL_STATE_STABILIZING;
+                    s_stable_dwell_counter = 0;
+                    s_unstable_counter = 0;
+                }
+            } else {
+                /* Error is within limits, reset counter */
+                s_unstable_counter = 0;
+            }
         }
     }
     
