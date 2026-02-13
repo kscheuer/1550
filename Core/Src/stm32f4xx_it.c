@@ -212,7 +212,19 @@ void SysTick_Handler(void)
 void EXTI2_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI2_IRQn 0 */
+  if (__HAL_GPIO_EXTI_GET_IT(MASTER_START_Pin) != RESET) {
+    /* Clear the interrupt flag immediately */
+    __HAL_GPIO_EXTI_CLEAR_IT(MASTER_START_Pin);
 
+    /* Check pin state to determine edge (Rising vs Falling) */
+    if (HAL_GPIO_ReadPin(MASTER_START_GPIO_Port, MASTER_START_Pin) == GPIO_PIN_SET) {
+      /* RISING EDGE -> Turn laser on to stored run current */
+      Laser_TurnOn();
+    } else {
+      /* FALLING EDGE -> Turn laser off (DAC = 0) */
+      Laser_TurnOff();
+    }
+  }
   /* USER CODE END EXTI2_IRQn 0 */
   /* USER CODE BEGIN EXTI2_IRQn 1 */
 

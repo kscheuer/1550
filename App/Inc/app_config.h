@@ -38,15 +38,17 @@
 /* PID Integrator Limits */
 /** Anti-windup limit for thermal integrator
  * Set so i_term (Ki * integrator) can reach desired output range.
- * With Ki=0.1 and Output=0.3, Limit should be 10.0 to prevent early clamping 
- * I dont think this limit really does anything since 30% output limits anyways mayebe we dont need this*/
+ * With Ki=0.1 and PID output limit=0.3, integrator Limit of 3.0 is what we need. 
+ * IF YOU CHANGE Ki, YOU MUST CHANGE THIS LIMIT ACCORDINGLY TO ENSURE PID OUTPUT CAN REACH FULL RANGE. */
 
-#define THERMAL_PID_INTEGRATOR_MIN  (-10.0f)
-#define THERMAL_PID_INTEGRATOR_MAX  10.0f
-#define THERMAL_ERROR_LIMIT     0.1f    /* +/- 0.1 degrees C considered stable */
+#define THERMAL_PID_INTEGRATOR_MIN  (-3.0f)
+#define THERMAL_PID_INTEGRATOR_MAX  3.0f
+
+#define THERMAL_ERROR_LIMIT     0.3f    /* +/- 0.3 degrees C considered stable */
 
 /* PID Loop Timing */
 #define THERMAL_LOOP_DT             0.025f  /* 40Hz = 25ms */
+#define THERMAL_LOSS_LOCK_COUNT     40      /* 1 second at 40Hz */
 
 /* TEC Drive Limits (Internal DAC 12-bit) 
 
@@ -146,6 +148,16 @@
  * ============================================================================ */
 
 /* Laser Current DAC (External DAC8411 16-bit) */
+
+/* Laser driver potentiometer should be set to 15 Ohm. 
+DAC8411 gets 5V power supplied to it. 
+With 15 Ohm pot this means that the DAC can supply 330mA. 
+The BJT can only handle 3.3V/220mA. 
+So we need to limit the DAC output to 3.3V/5V x 2^16 bits = 43253 to prevent overcurrent.
+This is equivalenetly 0.66. which is relevant since our writedacfireandforget requests values 0-1. 
+This is a hard limit based on the hardware and should never be exceeded regardless of software settings. 
+
+*/
 #define LASER_DAC_BITS              16
 #define LASER_DAC_MAX_VALUE         65535U  /*DO NOT EXCEED DAC_HARDWARE_LIMIT */
 

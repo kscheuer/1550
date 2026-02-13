@@ -25,6 +25,7 @@ extern "C" {
 #define THERMAL_ERROR_TEMPERATURE       -999.0f /* Sentinel value for float temp errors */
 #define THERMAL_ERROR_I2C_COMM          0x02
 #define THERMAL_ERROR_TEMP_LIMIT        0x03
+#define THERMAL_ERROR_UNSTABLE          0x04
 
 #define ADN8834_VMID            1.25f
 
@@ -48,12 +49,18 @@ typedef struct {
 /** 
  * Thermal Control Context Structure 
  */
+typedef enum {
+    THERMAL_STATE_OFF = 0,
+    THERMAL_STATE_RUNNING
+} ThermalState_t;
+
 typedef struct {
     float temperature;          /* Current temperature (deg C) */
     float target_temp;          /* Target temperature (deg C) */
     float error;                /* Current error (deg C) */
     uint32_t error_code;        /* Last error code */
     uint16_t tec_output;        /* Current DAC output (0-4095) */
+    ThermalState_t state;       /* Current Control State */
     PIDController_t pid;        /* PID controller instance */
 } ThermalControlContext_t;
 
@@ -82,7 +89,7 @@ void Thermal_I2C_DMAComplete_Handler(void);
 /* This is referenced in thermal_control.c, declaring here to satisfy compiler if needed, 
    or the user needs to provide the header for it. 
    Assuming it comes from the laser control module. */
-#define ERROR_THERMAL_FAULT  0x01
+
 void LaserCurrent_NotifyThermalError(uint8_t error_code);
 
 #ifdef __cplusplus

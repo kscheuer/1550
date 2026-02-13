@@ -226,17 +226,20 @@ static void App_ProcessUSBCommand(uint8_t* cmd_buffer, uint32_t cmd_length) {
         }
     }
     else if (str_icmp(token, "l") == 0) {
-        /* Set Laser Current (DAC value) */
+        /* Set Laser Run Current (DAC value) without turning it on immediately unless enabled */
         char* arg = strtok(NULL, " \r\n");
         if (arg) {
             uint16_t dac_val = (uint16_t)atoi(arg);
             
             /* Convert integer DAC value (0-65535) to normalized float (0.0-1.0) */
             float normalized_val = (float)dac_val / 65535.0f;
-            Laser_SetCurrent(normalized_val);
+            
+            /* Update the stored "Run Current" */
+            /* If laser is already enabled (EXTI or command), this changes brightness immediately */
+            Laser_SetRunCurrent(normalized_val);
             
             char msg[64];
-            snprintf(msg, sizeof(msg), "Set Laser DAC: %u\r\n", dac_val);
+            snprintf(msg, sizeof(msg), "Set Laser Run Level: %u\r\n", dac_val);
             USB_Comm_SendMessage(msg);
 
             /* Enable 2-second temperature logging */
@@ -269,6 +272,14 @@ static void App_ProcessUSBCommand(uint8_t* cmd_buffer, uint32_t cmd_length) {
         char msg[64];
         snprintf(msg, sizeof(msg), "TEC DAC Output: %u\r\n", tec);
         USB_Comm_SendMessage(msg);
+    }
+    else if (str_icmp(token, "on") == 0) {
+        Laser_TurnOn();
+        USB_Comm_SendMessage("Laser: ON (Manual Override)\r\n");
+    }
+    else if (str_icmp(token, "off") == 0) {
+        Laser_TurnOff();
+        USB_Comm_SendMessage("Laser: OFF (Manual Override)\r\n");
     }
     else {
         char msg[64];
