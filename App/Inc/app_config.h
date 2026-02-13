@@ -161,6 +161,7 @@ This is a hard limit based on the hardware and should never be exceeded regardle
 */
 #define LASER_DAC_BITS              16
 #define LASER_DAC_MAX_VALUE         65535U  /*DO NOT EXCEED DAC_HARDWARE_LIMIT */
+#define LASER_RISE_TIME_MS          500     /* Stabilization delay before signaling Active */
 
 /** DO NOT CHANGE. This corresponds to 3.3V on the DAC. The BJT is not capabale
  * of a higher voltage than this despite the DAC being 5V */

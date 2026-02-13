@@ -25,6 +25,10 @@ static volatile bool g_laser_enabled = false;
 /* Flag to handle "Power applied while Trigger held HIGH" startup case */
 static volatile bool g_startup_pending_thermal_lock = false;
 
+/* Stabilization Delay Variables */
+static volatile uint32_t g_stabilization_start_tick = 0;
+static volatile bool g_stabilization_pending = false;
+
 /* ============================================================================
  * INTERNAL FUNCTIONS
  * ============================================================================ */
@@ -216,6 +220,10 @@ void Laser_TurnOn(void) {
     /* Ensure flag is cleared if we successfully turn on */
     g_startup_pending_thermal_lock = false; 
 
+    /* Start the stabilization timer for the reply signal */
+    g_stabilization_start_tick = HAL_GetTick();
+    g_stabilization_pending = true;
+
     Laser_SetCurrent(g_run_current);
     
     __set_PRIMASK(primask_bit); /* Restore interrupts */
@@ -232,6 +240,10 @@ void Laser_TurnOff(void) {
 
     g_laser_enabled = false;
     g_startup_pending_thermal_lock = false; /* Cancel startup retry if user cycled the pin */
+
+    /* Immediately drop the reply signal */
+    HAL_GPIO_WritePin(FLEX2_GPIO_Port, FLEX2_Pin, GPIO_PIN_RESET);
+    g_stabilization_pending = false;
 
     Laser_SetCurrent(0.0f);
     
@@ -259,6 +271,17 @@ void Laser_RunMaintenance(void) {
                 /* Success! We are running. Clear the startup flag so we don't auto-retry on future errors. */
                 g_startup_pending_thermal_lock = false;
             }
+        }
+    }
+
+    /* TASK 2: Handle Stabilization Delay for FLEX2 Signal */
+    if (g_stabilization_pending && g_laser_enabled)
+    {
+        /* Check if enough time has passed from TurnOn */
+        if ((HAL_GetTick() - g_stabilization_start_tick) >= LASER_RISE_TIME_MS)
+        {
+            HAL_GPIO_WritePin(FLEX2_GPIO_Port, FLEX2_Pin, GPIO_PIN_SET);
+            g_stabilization_pending = false; /* One-shot */
         }
     }
 }
